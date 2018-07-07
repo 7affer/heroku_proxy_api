@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "preinstall": "npm i -g pm2",
+    "start": "pm2 start server.js -i 4 --attach"
   },
   "keywords": [],
   "author": "",
