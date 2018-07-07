@@ -5,14 +5,13 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "npm i -g pm2",
-    "start": "pm2 start server.js -i 4 --attach"
+    "start": "pm2 start server.js -i 1 --attach"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.3",
-    "socket.io": "^2.1.1",
-    "socketio-sticky-session": "^0.4.3"
+    "socket.io": "^2.1.1"
   }
 }
