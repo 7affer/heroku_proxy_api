@@ -37,4 +37,4 @@ const stictyServer = sticky(stickySessionOptions, () => {
 
 stictyServer.listen(port);
 
-module.exports = server;
+module.exports = stictyServer;
