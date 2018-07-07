@@ -34,6 +34,8 @@ const stictyServer = sticky(options, () => {
   });
 
   app.set('io', io);
+
+  return server;
 });
 
 stictyServer.listen(port);
