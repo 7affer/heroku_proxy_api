@@ -16,16 +16,23 @@ const server = http.createServer(app);
 
 const io = socketIO(server);
 
-io.listen(server);
+io.listen(server, {transports: [
+  'websocket',
+  'polling',
+  'long-polling',
+]});
 
 io.on('connection', socket => {
   console.log('socket connected');
   socket.emit('hello', { message: 'world' });
+
+  setInterval(
+    () => socket.emit('hello', {message: `time: ${Date.now()}`}),
+    3000,
+  )
 });
 
 app.set('io', io);
-
-
 
 server.listen(port);
 
