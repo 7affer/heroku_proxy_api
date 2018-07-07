@@ -9,11 +9,7 @@ const port = process.env.PORT || '8080';
 var stickySessionOptions = {
   proxy: true, //activate layer 4 patching
   header: 'x-forwarded-for', //provide here your header containing the users ip
-  num: 2, //count of processes to create, defaults to maximum if omitted
-  sync: {
-    isSynced: true, //activate synchronization
-    event: 'mySyncEventCall' //name of the event you're going to call
-  }
+  num: 4, //count of processes to create, defaults to maximum if omitted
 }
 
 app.use('/api', (req, res) => {
@@ -27,9 +23,10 @@ const stictyServer = sticky(options, () => {
 
   const io = socketIO(server);
 
+  io.listen(server);
+
   io.on('connection', socket => {
     console.log('socket connected');
-
     socket.emit('hello', { message: 'world' });
   });
 
