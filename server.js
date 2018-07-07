@@ -18,7 +18,7 @@ app.use('/api', (req, res) => {
 
 app.set('port', port);
 
-const stictyServer = sticky(options, () => {
+const stictyServer = sticky(stickySessionOptions, () => {
   const server = http.createServer(app);
 
   const io = socketIO(server);
