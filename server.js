@@ -31,9 +31,7 @@ if (cluster.isMaster) {
 
   io.listen(server, {
     transports: [
-      'websocket',
-      'polling',
-      'long-polling',
+      'websocket'
     ]
   });
 
