@@ -2,34 +2,20 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const cluster = require('cluster');
+const stickyCluster = require('sticky-cluster');
 
+const processesNum = process.env.PM2_JOBS || 4;
+const port = process.env.PORT || '8080';
 
-if (cluster.isMaster) {
-  const processesNum = process.env.PM2_JOBS || 4;
-
-  for (let i = 0; i < processesNum; i++) {
-    cluster.fork();
-  }
-
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker} died with code ${code} and signal ${signal}`);
-    console.log('Restarting worker');
-    cluster.fork();
-  });
-
-} else {
+const workerThread = callback => {
   const app = express();
-  const port = process.env.PORT || '8080';
 
   app.use('/api', (req, res) => {
     res.status(200).send('api response');
   });
 
   app.set('port', port);
-
-
   const server = http.createServer(app);
-
   const io = socketIO(server);
 
   io.listen(server, {
@@ -51,8 +37,16 @@ if (cluster.isMaster) {
   });
 
   app.set('io', io);
+  // server.listen(port);
+  // console.log(`server started at port: ${port}`);
 
-  server.listen(port);
-
-  console.log(`server started at port: ${port}`);
+  callback(server);
 }
+
+stickyCluster(
+  workerThread,
+  {
+    concurrency: processesNum,
+    port
+  }
+);
