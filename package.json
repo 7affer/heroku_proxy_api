@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "preinstall": "npm i -g pm2",
-    "start": "pm2 start server.js -i $PM2_JOBS --attach"
+    "start": "node ./server.js"
   },
   "keywords": [],
   "author": "",

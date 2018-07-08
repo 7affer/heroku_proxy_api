@@ -1,39 +1,58 @@
 const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
-
-const app = express();
-const port = process.env.PORT || '8080';
-
-app.use('/api', (req, res) => {
-  res.status(200).send('api response');
-});
-
-app.set('port', port);
+const cluster = require('cluster');
 
 
-const server = http.createServer(app);
+if (cluster.isMaster) {
+  const processesNum = process.env.PM2_JOBS || 4;
 
-const io = socketIO(server);
+  for (let i = 0; i < processesNum; i++) {
+    cluster.fork();
+  }
 
-io.listen(server, {transports: [
-  'websocket',
-  'polling',
-  'long-polling',
-]});
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker} died with code ${code} and signal ${signal}`);
+    console.log('Restarting worker');
+    cluster.fork();
+  });
 
-io.on('connection', socket => {
-  console.log('socket connected');
-  socket.emit('hello', { message: 'world' });
+} else {
+  const app = express();
+  const port = process.env.PORT || '8080';
 
-  setInterval(
-    () => socket.emit('hello', {message: `time: ${Date.now()}`}),
-    3000,
-  )
-});
+  app.use('/api', (req, res) => {
+    res.status(200).send('api response');
+  });
 
-app.set('io', io);
+  app.set('port', port);
 
-server.listen(port);
 
-module.exports = server;
+  const server = http.createServer(app);
+
+  const io = socketIO(server);
+
+  io.listen(server, {
+    transports: [
+      'websocket',
+      'polling',
+      'long-polling',
+    ]
+  });
+
+  io.on('connection', socket => {
+    console.log('socket connected');
+    socket.emit('hello', { message: 'world' });
+
+    setInterval(
+      () => socket.emit('hello', { message: `time: ${Date.now()}` }),
+      3000,
+    )
+  });
+
+  app.set('io', io);
+
+  server.listen(port);
+
+  console.log(`server started at port: ${port}`);
+}
