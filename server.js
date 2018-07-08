@@ -17,7 +17,7 @@ const options = {
   }
 }
 
-cont stickyServer = sticky(options, workerProcess);
+const stickyServer = sticky(options, workerProcess);
 
 stickyServer.on('connection', socket => {
   console.log('sticky socket connected');
